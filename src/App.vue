@@ -11,17 +11,16 @@
     </main>
   </div>
   <Toaster class="pointer-events-auto" />
-
 </template>
 
 <script setup lang="ts">
 import { Toaster } from 'vue-sonner';
-import BreadcrumbComponent from './components/header/BreadcrumbComponent .vue';
 import HeaderMain from './components/header/HeaderMain.vue';
 import FadeLayout from './components/layouts/FadeLayout.vue';
 import { useRoute } from 'vue-router';
 import { computed, onBeforeMount } from 'vue';
 import { useConfigStore } from './stores/configStore/config';
+import BreadcrumbComponent from './components/header/BreadcrumbComponent .vue';
 
 const route = useRoute();
 const hideHeader = computed(() => route.meta.hideHeader === true);
@@ -30,14 +29,12 @@ const wrapperStyle = computed(() => ({
   padding: hideHeader.value ? '0' : '24px 16px',
   maxWidth: hideHeader.value ? '100%' : "1532px"
 }));
-const configStore = useConfigStore()
+const configStore = useConfigStore();
 
 onBeforeMount(async () => {
-  await configStore.loadConfig()
-})
-
+  await configStore.loadConfig();
+});
 </script>
-
 
 <style scoped>
 #wrapper {
@@ -51,6 +48,7 @@ onBeforeMount(async () => {
   margin: 0 auto;
 }
 </style>
+
 <style>
 :root {
   font-synthesis: none;

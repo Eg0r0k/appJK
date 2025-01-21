@@ -3,7 +3,7 @@ import type { BulletLegendItemInterface } from '@unovis/ts'
 import { buttonVariants } from '@/components/ui/button'
 import { BulletLegend } from '@unovis/ts'
 import { VisBulletLegend } from '@unovis/vue'
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onBeforeMount, ref } from 'vue'
 
 const props = withDefaults(defineProps<{ items: BulletLegendItemInterface[] }>(), {
   items: () => [],
@@ -16,7 +16,7 @@ const emits = defineEmits<{
 
 const elRef = ref<HTMLElement>()
 
-onMounted(() => {
+onBeforeMount(() => {
   const selector = `.${BulletLegend.selectors.item}`
   nextTick(() => {
     const elements = elRef.value?.querySelectorAll(selector)
@@ -43,9 +43,6 @@ function onLegendItemClick(d: BulletLegendItemInterface, i: number) {
 
 <template>
   <div ref="elRef" class="w-max">
-    <VisBulletLegend
-      :items="items"
-      :on-legend-item-click="onLegendItemClick"
-    />
+    <VisBulletLegend :items="items" :on-legend-item-click="onLegendItemClick" />
   </div>
 </template>

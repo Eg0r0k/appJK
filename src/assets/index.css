@@ -136,3 +136,34 @@ body {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted));
 }
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+div,
+li,
+td,
+th,
+label,
+article,
+section,
+blockquote,
+pre,
+code,
+em,
+strong,
+i,
+b,
+small,
+sub,
+sup,
+cite,
+q,
+time,
+mark {
+  cursor: default !important;
+}

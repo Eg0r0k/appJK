@@ -1,23 +1,24 @@
 <template>
     <div class="mb-4 flex items-center gap-2">
         <Avatar class="h-14 w-14">
-            <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-            <AvatarFallback>SC</AvatarFallback>
+            <AvatarImage src="/avatars/01.png" :alt="authStore.username" />
+            <AvatarFallback>{{ authStore.initials }}</AvatarFallback>
         </Avatar>
         <div>
-            <h3 class="text-2xl">Антон Антонович
+            <h3 class="text-2xl">
+                {{ authStore.fullName }}
                 <span class="text-muted-foreground">
                     (Оператор)
                 </span>
             </h3>
             <p class="text-xs flex items-center">
-                User ID:
+                User ID:    
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <span @click="copy"
                                 class="text-muted-foreground cursor-pointer max-w-[140px] truncate ml-1 block">
-                                {{ id }}
+                                {{ authStore.authData!.id }}
                             </span>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -40,8 +41,11 @@ import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
 import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue';
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
 import { useClipBoard } from '@/lib/useClipboard';
-import { ref } from 'vue';
-const id = ref('asdas-asdsdsd-sdsdasdasdasdasdasasdsa')
+import { useAuthStore } from '@/stores/authStore/auth';
 
-const copy = async () => await useClipBoard(id.value)
+
+const authStore = useAuthStore()
+
+const copy = async () => await useClipBoard(authStore.authData!.id)
+
 </script>

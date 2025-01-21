@@ -8,8 +8,9 @@
                 <CardHeader>
                     <CardTitle>Статистика</CardTitle>
                 </CardHeader>
-                <CardContent class="pl-2">
-                    <LineChart :data="activityData" :options="chartOptions" :categories="['tasks']" index="day" />
+                <CardContent class="pl-2 ">
+                    <LineChart :data="activityData" :options="chartOptions" :categories="['tasks', 'requests']"
+                        index="day" />
                 </CardContent>
             </Card>
             <Card class="col-span-1 sm:col-span-2 lg:col-span-3">
@@ -49,10 +50,19 @@ const activityData = ref([
 const chartOptions = ref({
     responsive: true,
     plugins: {
-        legend: {
-            position: 'top',
-        },
 
+        tooltip: {
+            enabled: true,
+        },
     },
+    scales: {
+        y: {
+            beginAtZero: true,
+        },
+        x: {
+
+        }
+    },
+
 });
 </script>

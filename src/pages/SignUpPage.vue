@@ -43,8 +43,8 @@
         </div>
 
         <div class="hidden bg-muted lg:block">
-            <img src="/img/bg-signup.png" alt="Bg-image" width="1920" height="1080"
-                class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+            <img src="/img/bg-signup.png" draggable="false" alt="Bg-image" width="1920" height="1080"
+                class="h-full select-none w-full object-cover dark:brightness-[0.2] dark:grayscale" />
         </div>
     </div>
 </template>

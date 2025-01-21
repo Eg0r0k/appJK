@@ -2,7 +2,16 @@
     <div>
         <div class="flex justify-between mb-4">
             <h2 class="text-3xl font-bold tracking-tight">Дашборд</h2>
-            <Button @click="downloadExcel">Скачать</Button>
+            <TooltipProvider>
+                <Tooltip >
+                    <TooltipTrigger as-child>
+                        <Button @click="downloadExcel">Скачать</Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                        <p>Сформировать отчет в формате Exel</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
         </div>
         <DashboardStats ref="dashboardStats" />
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 mt-4">
@@ -38,6 +47,10 @@ import CardHeader from '@/components/ui/card/CardHeader.vue';
 import CardTitle from '@/components/ui/card/CardTitle.vue';
 import { isTauri } from '@tauri-apps/api/core';
 import { useFileSaver } from '@/lib/useFileSaver';
+import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
+import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
+import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue';
+import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
 const { saveFile } = useFileSaver();
 
 const downloadExcel = async () => {
@@ -56,10 +69,11 @@ const downloadExcel = async () => {
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
+
     await saveFile(buffer, {
-        fileName: 'статистика.xlsx',
-        fileType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        filters: [{ name: 'Excel Files', extensions: ['xlsx'] }],
+        fileName: "stat",
+        fileType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filters: [{ name: "Excel Files", extensions: ["xlsx"] }]
     });
 };
 </script>

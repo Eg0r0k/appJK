@@ -3,7 +3,7 @@
         <h2 class="text-3xl font-bold tracking-tight mb-4">Электростанции</h2>
         <StationFilters v-model:searchQuery="searchQuery" v-model:sortOrder="sortOrder"
             v-model:selectedStatuses="selectedStatuses" @reset-filters="resetFilters" />
-        <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div v-if="isLoading" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 ">
             <Skeleton class="w-full h-[203px]" v-for="i in 12" :key="i" />
         </div>
 
@@ -125,7 +125,6 @@ onMounted(() => {
 
 .list-leave-active {
     position: absolute;
-    width: calc(21% - 1rem);
     will-change: transform, opacity;
 }
 </style>

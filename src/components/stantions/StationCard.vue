@@ -15,8 +15,8 @@
                 </svg>
             </div>
             <div class="text-xs px-2 py-1 rounded-full text-nowrap" :class="{
-                'bg-green-200 text-green-800': station.status === StationStatus.Active,
                 'bg-red-200 text-red-800': station.status === StationStatus.Inactive,
+                'bg-green-200 text-green-800': station.status === StationStatus.Active,
                 'bg-yellow-200 text-yellow-800': station.status === StationStatus.Unknown,
                 'bg-transparent border': station.status === StationStatus.NotUsed
             }">

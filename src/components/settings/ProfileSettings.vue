@@ -86,6 +86,7 @@ import AlertDialogFooter from '../ui/alert-dialog/AlertDialogFooter.vue';
 import AlertDialogAction from '../ui/alert-dialog/AlertDialogAction.vue';
 import AlertDialogCancel from '../ui/alert-dialog/AlertDialogCancel.vue';
 import AlertDialogDescription from '../ui/alert-dialog/AlertDialogDescription.vue';
+import { useAuthStore } from '@/stores/authStore/auth';
 const profileFormSchema = toTypedSchema(z.object({
   username: z.string()
 
@@ -98,11 +99,13 @@ const profileFormSchema = toTypedSchema(z.object({
   email: z.string()
     .email({ message: "Не правильная почта" })
 }))
+const authStore = useAuthStore()
+
 const { handleSubmit, resetForm } = useForm({
   validationSchema: profileFormSchema,
   initialValues: {
-    username: 'aboba',
-    email: 'asdasd@sds.ds'
+    username: authStore.username,
+    email: authStore.email
   }
 })
 const onSubmit = handleSubmit((values) => {

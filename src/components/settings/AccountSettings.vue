@@ -4,7 +4,7 @@
     <p class="text-sm text-muted-foreground">Обновите данные своего аккаунта, установите имя и дату рождения</p>
   </div>
   <Separator />
-  <Form v-slot="{ setFieldValue }" :validation-schema="accountFormSchema" class="space-y-8">
+  <form @submit="onSubmit" class="space-y-8">
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
         <FormLabel>Имя</FormLabel>
@@ -53,8 +53,8 @@
                     <SelectValue placeholder="Выберите месяц" />
                   </SelectTrigger>
                   <SelectContent class="max-h-[200px]">
-                    <SelectItem v-for="month in createYear({ dateObj: placeholder })" :key="month.toString()"
-                      :value="month.month.toString()">
+                    <SelectItem v-for="month in createYear({ dateObj: placeholder as DateValue, numberOfMonths: 12 })"
+                      :key="month.toString()" :value="month.month.toString()">
                       {{ formatter.custom(toDate(month), { month: 'long' }) }}
                     </SelectItem>
                   </SelectContent>
@@ -78,8 +78,9 @@
                 </Select>
               </div>
             </div>
-            <Calendar v-model:placeholder="placeholder" v-model="dateValue" calendar-label="Дата рождения" initial-focus
-              :min-value="new CalendarDate(1900, 1, 1)" :max-value="today(getLocalTimeZone())" @update:model-value="(v: any) => {
+            <Calendar v-model:placeholder="placeholder as DateValue" v-model="dateValue" calendar-label="Дата рождения"
+              initial-focus :min-value="new CalendarDate(1999, 1, 1)" :max-value="today(getLocalTimeZone())"
+              @update:model-value="(v: any) => {
                 if (v) {
                   dateValue = v
                   setFieldValue('dob', toDate(v).toISOString())
@@ -101,7 +102,7 @@
         Применить
       </Button>
     </div>
-  </Form>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -110,14 +111,14 @@ import FormItem from '../ui/form/FormItem.vue';
 import FormLabel from '../ui/form/FormLabel.vue';
 import FormControl from '../ui/form/FormControl.vue';
 import Input from '../ui/input/Input.vue';
-import { Form, FormField } from '../ui/form';
+import { FormField } from '../ui/form';
 import FormDescription from '../ui/form/FormDescription.vue';
 import FormMessage from '../ui/form/FormMessage.vue';
 import Popover from '../ui/popover/Popover.vue';
 import PopoverTrigger from '../ui/popover/PopoverTrigger.vue';
 import Button from '../ui/button/Button.vue';
 import { cn } from '@/lib/utils';
-import { CalendarDate, DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
+import { CalendarDate, DateFormatter, DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { toDate } from 'radix-vue/date';
 import { ref, computed } from 'vue';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -133,18 +134,22 @@ import {
 } from '@/components/ui/select';
 import { createYear } from 'radix-vue/date';
 import { useDateFormatter } from 'radix-vue';
+import { useForm } from 'vee-validate';
+import { useAuthStore } from '@/stores/authStore/auth';
 
 const df = new DateFormatter('ru-Ru', {
   dateStyle: 'long',
 });
 const dateValue = ref();
-const placeholder = ref(today(getLocalTimeZone()));
+const placeholder = ref<DateValue>(today(getLocalTimeZone()));
+const formatter = useDateFormatter('ru');
+
 
 const years = computed(() => {
-  const startYear = 2025;
+  const currentYear = new Date().getFullYear();
   const endYear = 1999;
   const yearsList = [];
-  for (let year = startYear; year >= endYear; year--) {
+  for (let year = currentYear; year >= endYear; year--) {
     yearsList.push(year);
   }
   return yearsList;
@@ -171,6 +176,20 @@ const accountFormSchema = toTypedSchema(z.object({
     }),
   dob: z.string().datetime().optional().refine(date => date !== undefined, 'Выберете действительную дату.'),
 }));
+const authStore = useAuthStore()
 
-const formatter = useDateFormatter('ru');
+const { handleSubmit, setFieldValue } = useForm({
+  validationSchema: accountFormSchema,
+  initialValues: {
+    name: authStore.authData?.firstName,
+    fname: authStore.authData?.lastName
+  }
+
+});
+const onSubmit = handleSubmit((values) => {
+  console.log(values)
+});
+
+
+
 </script>
