@@ -1,24 +1,33 @@
 <template>
     <div>
-        <h2 class="text-3xl font-bold tracking-tight mb-4">Электростанции</h2>
-        <StationFilters v-model:searchQuery="searchQuery" v-model:sortOrder="sortOrder"
-            v-model:selectedStatuses="selectedStatuses" @reset-filters="resetFilters" />
-        <div v-if="isLoading" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 ">
-            <Skeleton class="w-full h-[203px]" v-for="i in 12" :key="i" />
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold tracking-tight mb-4">Электростанции</h2>
+            <StationFilters v-model:searchQuery="searchQuery" v-model:sortOrder="sortOrder"
+                v-model:selectedStatuses="selectedStatuses" @reset-filters="resetFilters" />
         </div>
 
-        <div v-if="!isLoading && filteredStations.length === 0" class=" text-center text-muted-foreground">
-            Не найдено электростанций по заданным фильтрам
+        <div v-if="isLoading" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+            <Skeleton class="w-full h-[203px]" v-for="i in 12" :key="`skeleton-${i}`" />
         </div>
-        <TransitionGroup name="list" tag="div" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 ">
-            <StationCard v-for="station in filteredStations" :key="station.id" :station="station" @edit="openSheet" />
-        </TransitionGroup>
+
+        <div v-else>
+
+            <div v-auto-animate class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+                <StationCard v-for="station in filteredStations" :key="station.id" :station="station"
+                    @edit="openSheet" />
+                <div v-if="filteredStations.length === 0" class="text-center text-muted-foreground py-12 col-span-4">
+                    Не найдено электростанций по заданным фильтрам
+                </div>
+
+            </div>
+        </div>
+
         <StationSheet v-model:open="isSheetOpen" :station="selectedStation" @save="saveChanges" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { Station, StationStatus } from '@/types/station';
 import StationFilters from '@/components/stantions/StationFilters.vue';
 import StationCard from '@/components/stantions/StationCard.vue';
@@ -56,7 +65,6 @@ const filteredStations = computed(() => {
     let filtered = stations.value.filter(station => {
         const normalizedName = normalize(station.name);
         const normalizedAddress = normalize(station.address);
-
         return normalizedName.includes(query) || normalizedAddress.includes(query);
     });
 
@@ -93,38 +101,5 @@ const resetFilters = () => {
     selectedStatuses.value.clear();
 };
 
-onMounted(() => {
-    loadStations();
-});
+loadStations();
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.25s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
-.list-enter-active,
-.list-leave-active {
-    transition: all 0.25s ease;
-}
-
-.list-move {
-    transition: transform 0.25s ease;
-}
-
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
-}
-
-.list-leave-active {
-    position: absolute;
-    will-change: transform, opacity;
-}
-</style>

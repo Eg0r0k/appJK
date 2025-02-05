@@ -21,6 +21,7 @@ fn set_theme(theme: &str, window: tauri::Window) {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![set_theme])

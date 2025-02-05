@@ -33,8 +33,8 @@ const links = [
 
 const isActive = (path: string) => {
     if (path === '/') {
-        return route.path === path; 
+        return route.path === path;
     }
-    return route.path.startsWith(path); 
+    return route.path.startsWith(path);
 };
 </script>

@@ -1,3 +1,8 @@
+<template>
+    <div class="w-full">
+        <BarChart :data="data" :categories="['total']" :index="'name'" :rounded-corners="4" />
+    </div>
+</template>
 <script setup lang="ts">
 import BarChart from '../ui/chart-bar/BarChart.vue';
 
@@ -17,9 +22,3 @@ const data = [
     { name: 'Дек', total: Math.floor(Math.random() * 5000) + 1000 },
 ]
 </script>
-
-<template>
-    <div class="w-full">
-        <BarChart :data="data" :categories="['total']" :index="'name'" :rounded-corners="4" />
-    </div>
-</template>

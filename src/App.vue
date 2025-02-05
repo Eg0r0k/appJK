@@ -31,9 +31,13 @@ const wrapperStyle = computed(() => ({
 }));
 const configStore = useConfigStore();
 
+
+
 onBeforeMount(async () => {
   await configStore.loadConfig();
 });
+
+
 </script>
 
 <style scoped>

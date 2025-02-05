@@ -35,7 +35,21 @@ export const routes: RouteRecordRaw[] = [
     path: "/connections",
     name: ROUTE_NAMES.CONNECTIONS,
     component: ConnectionsPage,
-    meta: { title: "Подключения", requiresAuth: true },
+    meta: {
+      title: "Подключения",
+      requiresAuth: true,
+      breadcrumbName: "Подключения",
+    },
+  },
+  {
+    path: "/connections/:id",
+    name: "ConnectionDetail",
+    component: () => import("@/pages/ConnectionDetailPage.vue"),
+    meta: {
+      title: "Детали подключения",
+      requiresAuth: true,
+      breadcrumbName: (route: any) => `Подключение #${route.params.id}`,
+    },
   },
   {
     path: "/power-plants",
@@ -61,6 +75,7 @@ export const routes: RouteRecordRaw[] = [
     component: ProfilePage,
     meta: { title: "Профиль", requiresAuth: true },
   },
+
   {
     path: "/settings",
     name: ROUTE_NAMES.SETTINGS,

@@ -2,13 +2,14 @@
     <div>
         <div class="flex justify-between mb-4">
             <h2 class="text-3xl font-bold tracking-tight">Дашборд</h2>
+
             <TooltipProvider>
-                <Tooltip >
+                <Tooltip>
                     <TooltipTrigger as-child>
                         <Button @click="downloadExcel">Скачать</Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
-                        <p>Сформировать отчет в формате Exel</p>
+                        <p>Сформировать отчет в формате Excel</p>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
@@ -27,16 +28,14 @@
                 <CardHeader>
                     <CardTitle>Потребление</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    123
-                </CardContent>
+                <DashboardConsumption :data="consumptionData" :colors="CHART_COLORS" type="pie" />
             </Card>
         </div>
     </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { Ref, ref } from 'vue';
 import ExcelJS from 'exceljs';
 import DashboardOverview from '@/components/dashboard/DashboardOverview.vue';
 import DashboardStats from '@/components/dashboard/DashboardStats.vue';
@@ -45,7 +44,6 @@ import Card from '@/components/ui/card/Card.vue';
 import CardContent from '@/components/ui/card/CardContent.vue';
 import CardHeader from '@/components/ui/card/CardHeader.vue';
 import CardTitle from '@/components/ui/card/CardTitle.vue';
-import { isTauri } from '@tauri-apps/api/core';
 import { useFileSaver } from '@/lib/useFileSaver';
 import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
 import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
@@ -53,7 +51,24 @@ import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue';
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
 const { saveFile } = useFileSaver();
 
-const downloadExcel = async () => {
+import DashboardConsumption from '@/components/dashboard/DashboardConsumption.vue';
+interface ConsumptionData {
+    name: string
+    total: number
+}
+
+const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#6366F1']
+
+const consumptionData: Ref<ConsumptionData[]> = ref([
+    { name: 'Оборудование', total: 2450 },
+    { name: 'Освещение', total: 1425 },
+    { name: 'Отопление', total: 1890 },
+    { name: 'Кондиционирование', total: 980 }
+])
+
+
+
+const downloadExcel = async (): Promise<void> => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Статистика');
 

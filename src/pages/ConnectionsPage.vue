@@ -3,9 +3,47 @@
         <h2 class="text-3xl font-bold tracking-tight mb-4">
             Подключения
         </h2>
+        <div class="flex gap-2 items-center mb-4">
+            <Input v-model="searchQuery" placeholder="Поиск по названию..." class="h-8 w-[150px] lg:w-[250px]" />
 
-        <!-- Таблица -->
-        <div class="rounded-md border">
+            <Popover>
+                <PopoverTrigger as-child>
+                    <Button variant="outline" size="sm" class="h-8 border-dashed">
+                        Сортировка по статусу
+                        <template v-if="sortOrder !== 'none'">
+                            <Separator orientation="vertical" class="mx-2 h-4" />
+                            <Badge variant="secondary" class="rounded-sm px-1 font-normal">
+                                {{ sortOrder === 'asc' ? 'А-Я' : 'Я-А' }}
+                            </Badge>
+                        </template>
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent class="w-[200px] p-0" align="start">
+                    <Command>
+                        <CommandList>
+                            <CommandGroup>
+                                <CommandItem value="asc" @select="sortOrder = 'asc'">
+                                    По возрастанию
+                                </CommandItem>
+                                <CommandItem value="desc" @select="sortOrder = 'desc'">
+                                    По убыванию
+                                </CommandItem>
+                            </CommandGroup>
+                            <CommandSeparator />
+                            <CommandGroup>
+                                <CommandItem value="none" @select="sortOrder = 'none'">
+                                    Сбросить сортировку
+                                </CommandItem>
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+        </div>
+        <div class="rounded border min-h-[400px] relative ">
+            <div class="absolute inset-0 bg-background/50 backdrop-blur-[1px] z-10 transition-opacity duration-300"
+                :class="isLoading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'" />
+
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -13,41 +51,92 @@
                             <Checkbox :checked="isAllSelected" @update:checked="toggleSelectAll" />
                         </TableHead>
                         <TableHead>
-                            <Input v-model="filters.address" placeholder="Фильтр по адресу" />
+                            ID
+                            <!-- <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <Button variant="ghost" size="sm" class=" h-8 data-[state=open]:bg-accent">
+                                        <span> ID </span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                    <DropdownMenuItem>
+                                        <ArrowUpIcon class="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                                        Asc
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <ArrowDownIcon class="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                                        Desc
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <EyeNoneIcon class="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                                        Hide
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu> -->
                         </TableHead>
-                        <TableHead>
-                            <Input v-model="filters.status" placeholder="Фильтр по статусу" />
-                        </TableHead>
-                        <TableHead>
-                            <Input v-model="filters.name" placeholder="Фильтр по названию" />
-                        </TableHead>
-                        <TableHead>
-                            <Input v-model="filters.date" placeholder="Фильтр по дате" />
-                        </TableHead>
-                        <TableHead>
-                            <Input v-model="filters.id" placeholder="Фильтр по ID" />
-                        </TableHead>
+                        <TableHead>Статус</TableHead>
+                        <TableHead>Название</TableHead>
+                        <TableHead>Дата</TableHead>
+                        <TableHead>Адрес</TableHead>
                     </TableRow>
                 </TableHeader>
+
                 <TableBody>
-                    <TableRow v-for="item in paginatedData" :key="item.id">
-                        <TableCell>
-                            <Checkbox :checked="selectedItems.includes(item.id)"
-                                @update:checked="(checked) => toggleSelectItem(item.id, checked)" />
-                        </TableCell>
-                        <TableCell>{{ item.address }}</TableCell>
-                        <TableCell>{{ item.status }}</TableCell>
-                        <TableCell>{{ item.name }}</TableCell>
-                        <TableCell>{{ item.date }}</TableCell>
-                        <TableCell>{{ item.id }}</TableCell>
-                    </TableRow>
+                    <template v-if="isLoading">
+                        <TableRow v-for="i in itemsPerPage" :key="`skeleton-${i}`" class="h-[40px]">
+                            <TableCell v-for="(_, index) in 6" :key="index">
+                                <Skeleton class="h-4 w-full" />
+                            </TableCell>
+                        </TableRow>
+                    </template>
+
+                    <template v-else>
+                        <TableRow v-for="item in filteredData" :key="item.id"
+                            class="cursor-pointer hover:bg-muted/50 transition-colors h-[40px]"
+                            @click="goToDetail(item.id)">
+                            <TableCell @click.stop>
+                                <Checkbox :checked="selectedItems.includes(item.id)" />
+                            </TableCell>
+                            <TableCell>{{ item.id }}</TableCell>
+                            <TableCell>
+                                <Badge :variant="item.status === 'Активен' ? 'outline' : 'secondary'">
+                                    {{ item.status }}
+                                </Badge>
+                            </TableCell>
+                            <TableCell class="max-w-[400px]">
+                                <div class="flex items-center gap-2  truncate font-medium">
+                                    <Badge variant="outline" class="shrink-0">
+                                        {{ item.type }}
+                                    </Badge>
+                                    <span class="truncate">
+                                        {{ item.description }}
+                                    </span>
+                                </div>
+                            </TableCell>
+                            <TableCell>{{ item.date }}</TableCell>
+                            <TableCell>{{ item.address }}</TableCell>
+                            <TableCell class="text-right">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger as-child>
+                                        <Button variant="ghost" class="h-8 w-8 p-0" @click.stop>
+                                            ...
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem class="text-destructive" @click="deleteItem(item.id)">
+                                            Удалить
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                    </template>
                 </TableBody>
             </Table>
         </div>
 
-        <!-- Пагинация и управление строками -->
         <div class="flex items-center justify-between mt-4">
-            <!-- Dropdown для выбора количества строк на странице -->
             <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                     <Button variant="outline">
@@ -63,11 +152,8 @@
                 </DropdownMenuContent>
             </DropdownMenu>
 
-
-
-            <!-- Пагинация -->
-            <Pagination v-slot="{ page }" :total="filteredData.length" :sibling-count="1" show-edges
-                :default-page="currentPage" @update:page="handlePageChange">
+            <Pagination v-slot="{ page }" :total="totalItems" :sibling-count="1" show-edges :default-page="currentPage"
+                @update:page="handlePageChange">
                 <PaginationList v-slot="{ items }" class="flex items-center gap-1">
                     <PaginationFirst @click="goToFirstPage" />
                     <PaginationPrev @click="previousPage" />
@@ -80,11 +166,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell
+} from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import {
     Pagination,
     PaginationFirst,
@@ -97,122 +191,131 @@ import DropdownMenu from '@/components/ui/dropdown-menu/DropdownMenu.vue';
 import DropdownMenuTrigger from '@/components/ui/dropdown-menu/DropdownMenuTrigger.vue';
 import DropdownMenuContent from '@/components/ui/dropdown-menu/DropdownMenuContent.vue';
 import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue';
+import Popover from '@/components/ui/popover/Popover.vue';
+import Input from '@/components/ui/input/Input.vue';
+import PopoverTrigger from '@/components/ui/popover/PopoverTrigger.vue';
+import Button from '@/components/ui/button/Button.vue';
+import Separator from '@/components/ui/separator/Separator.vue';
+import PopoverContent from '@/components/ui/popover/PopoverContent.vue';
+import Command from '@/components/ui/command/Command.vue';
+import CommandList from '@/components/ui/command/CommandList.vue';
+import CommandGroup from '@/components/ui/command/CommandGroup.vue';
+import CommandItem from '@/components/ui/command/CommandItem.vue';
+import CommandSeparator from '@/components/ui/command/CommandSeparator.vue';
 
-// Пример данных
-const data = ref([
-    { id: 1, address: 'ул. Ленина, 10', status: 'Активен', name: 'Подключение 1', date: '2023-10-01' },
-    { id: 2, address: 'ул. Пушкина, 5', status: 'Неактивен', name: 'Подключение 2', date: '2023-10-02' },
-    { id: 3, address: 'ул. Гагарина, 15', status: 'Активен', name: 'Подключение 3', date: '2023-10-03' },
-    { id: 4, address: 'ул. Садовая, 20', status: 'Неактивен', name: 'Подключение 4', date: '2023-10-04' },
-    { id: 5, address: 'ул. Мира, 30', status: 'Активен', name: 'Подключение 5', date: '2023-10-05' },
-    { id: 6, address: 'ул. Лесная, 40', status: 'Неактивен', name: 'Подключение 6', date: '2023-10-06' },
-    { id: 7, address: 'ул. Центральная, 50', status: 'Активен', name: 'Подключение 7', date: '2023-10-07' },
-    { id: 8, address: 'ул. Молодежная, 60', status: 'Неактивен', name: 'Подключение 8', date: '2023-10-08' },
-    { id: 9, address: 'ул. Школьная, 70', status: 'Активен', name: 'Подключение 9', date: '2023-10-09' },
-    { id: 10, address: 'ул. Заречная, 80', status: 'Неактивен', name: 'Подключение 10', date: '2023-10-10' },
-]);
+// Моковые данные с обновленной структурой
+const mockDatabase = Array.from({ length: 100 }, (_, i) => ({
+    id: i + 1,
+    address: `ул. Примерная, ${i + 1}`,
+    status: i % 2 === 0 ? 'Активен' : 'Неактивен',
+    type: ['Авария', 'Техработы', 'Подключение'][i % 3],
+    description: `Очень длинное описание задачи ${i + 1}, которое должно быть обрезано при превышении максимальной ширины контейнера. Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+    date: `2023-10-${String(i + 1).padStart(2, '0')}`
+}));
 
-const filters = ref({
-    address: '',
-    status: '',
-    name: '',
-    date: '',
-    id: '',
-});
+const data = ref<typeof mockDatabase>([]);
+const totalItems = ref(0);
+const isLoading = ref(false);
+const itemsPerPage = ref(10);
+const currentPage = ref(1);
+const selectedItems = ref<number[]>([]);
+const cachedData = ref<Record<number, typeof mockDatabase>>({});
+
+const searchQuery = ref('');
+const sortOrder = ref<'asc' | 'desc' | 'none'>('none');
 
 const filteredData = computed(() => {
-    return data.value.filter(item => {
-        return (
-            item.address.toLowerCase().includes(filters.value.address.toLowerCase()) &&
-            item.status.toLowerCase().includes(filters.value.status.toLowerCase()) &&
-            item.name.toLowerCase().includes(filters.value.name.toLowerCase()) &&
-            item.date.toLowerCase().includes(filters.value.date.toLowerCase()) &&
-            item.id.toString().includes(filters.value.id.toLowerCase())
+    let result = [...data.value];
+
+    // Фильтрация по поиску
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        result = result.filter(item =>
+            item.description.toLowerCase().includes(query)
         );
-    });
+    }
+
+    // Сортировка по статусу
+    if (sortOrder.value !== 'none') {
+        result.sort((a, b) => {
+            const compare = a.status.localeCompare(b.status);
+            return sortOrder.value === 'asc' ? compare : -compare;
+        });
+    }
+
+    return result;
 });
 
-const itemsPerPage = ref(10 );
-const currentPage = ref(1);
-const pageInput = ref(currentPage.value);
 
-const totalPages = computed(() => Math.ceil(filteredData.value.length / itemsPerPage.value));
 
-const paginatedData = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage.value;
-    const end = start + itemsPerPage.value;
-    return filteredData.value.slice(start, end);
-});
 
-const handlePageChange = (newPage: number) => {
-    currentPage.value = newPage;
-    pageInput.value = newPage;
+// Загрузка данных с кэшированием
+const fetchMockData = async (page: number, perPage: number) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    return mockDatabase.slice(start, end);
 };
 
-const goToFirstPage = () => {
-    currentPage.value = 1;
-    pageInput.value = 1;
-};
+const loadData = async () => {
+    try {
+        isLoading.value = true;
 
-const goToLastPage = () => {
-    currentPage.value = totalPages.value;
-    pageInput.value = totalPages.value;
-};
+        // Корректировка номера страницы
+        const maxPage = Math.ceil(mockDatabase.length / itemsPerPage.value);
+        currentPage.value = Math.min(Math.max(currentPage.value, 1), maxPage);
 
-const previousPage = () => {
-    if (currentPage.value > 1) {
-        currentPage.value--;
-        pageInput.value = currentPage.value;
+        if (!cachedData.value[currentPage.value]) {
+            const response = await fetchMockData(currentPage.value, itemsPerPage.value);
+            cachedData.value[currentPage.value] = response;
+            data.value = response;
+        } else {
+            data.value = cachedData.value[currentPage.value];
+        }
+
+        totalItems.value = mockDatabase.length;
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+    } finally {
+        isLoading.value = false;
     }
 };
-
-const nextPage = () => {
-    if (currentPage.value < totalPages.value) {
-        currentPage.value++;
-        pageInput.value = currentPage.value;
-    }
+const deleteItem = (id: number) => {
+    data.value = data.value.filter(item => item.id !== id);
 };
 
-const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages.value) {
-        currentPage.value = page;
-        pageInput.value = page;
-    }
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+const paginatedData = computed(() => data.value);
+
+// Навигация
+const router = useRouter();
+const goToDetail = (id: number) => {
+    router.push({ name: 'ConnectionDetail', params: { id } });
 };
 
-// Установка количества строк на странице
+// Управление пагинацией
+const handlePageChange = (newPage: number) => currentPage.value = newPage;
+const goToFirstPage = () => currentPage.value = 1;
+const goToLastPage = () => currentPage.value = totalPages.value;
+const previousPage = () => currentPage.value > 1 && currentPage.value--;
+const nextPage = () => currentPage.value < totalPages.value && currentPage.value++;
+
 const setItemsPerPage = (value: number) => {
     itemsPerPage.value = value;
-    currentPage.value = 1; // Сброс на первую страницу
+    const maxPage = Math.ceil(mockDatabase.length / value);
+    currentPage.value = Math.min(currentPage.value, maxPage);
+    cachedData.value = {};
 };
 
-// Выбор элементов
-const selectedItems = ref<number[]>([]);
-
-const toggleSelectItem = (id: number, checked: boolean) => {
-    if (checked) {
-        selectedItems.value.push(id);
-    } else {
-        selectedItems.value = selectedItems.value.filter(item => item !== id);
-    }
-};
-
-const isAllSelected = computed(() => {
-    return paginatedData.value.every(item => selectedItems.value.includes(item.id));
-});
-
+// Выделение элементов
+const isAllSelected = computed(() =>
+    paginatedData.value.every(item => selectedItems.value.includes(item.id))
+);
 const toggleSelectAll = (checked: boolean) => {
-    if (checked) {
-        selectedItems.value = paginatedData.value.map(item => item.id);
-    } else {
-        selectedItems.value = [];
-    }
+    selectedItems.value = checked ? paginatedData.value.map(item => item.id) : [];
 };
 
-// Следим за изменением страницы и обновляем pageInput
-watch(currentPage, (newPage) => {
-    pageInput.value = newPage;
-});
+// Инициализация
+onMounted(loadData);
+watch([currentPage, itemsPerPage], loadData);
 </script>
-
-<style lang="scss" scoped></style>

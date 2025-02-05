@@ -108,6 +108,7 @@ body {
   min-height: 100vh;
   line-height: normal;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 .dark body {
   @apply bg-background;
@@ -137,36 +138,11 @@ body {
   scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted));
 }
 
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-div,
-li,
-td,
-th,
-label,
-article,
-section,
-blockquote,
-pre,
-code,
-em,
-strong,
-i,
-b,
-small,
-sub,
-sup,
-cite,
-q,
-time,
-mark {
-  cursor: default !important;
-}
+/*TODO ADD in dev
+
+/* body {
+  user-select: none;
+} */
 
 button * {
   cursor: pointer !important;

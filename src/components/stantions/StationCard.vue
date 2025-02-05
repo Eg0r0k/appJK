@@ -1,6 +1,6 @@
 <template>
     <button @click="$emit('edit', station)"
-        :class="cn('flex  flex-col items-start gap-3 rounded-lg border select-none p-4 text-left transition-all hover:bg-accent/60 bg-white dark:bg-transparent ')">
+        :class="cn('flex  flex-col items-start gap-3 rounded-lg border select-none p-4 text-left transition-all dark:bg-transparent bg-white hover:bg-accent/60 max-h-fit ')">
 
         <div class="flex items-center justify-between w-full">
             <div class="flex items-center gap-2">

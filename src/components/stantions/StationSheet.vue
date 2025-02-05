@@ -35,7 +35,10 @@
           <Label for="generators" class="text-sm text-muted-foreground">Генераторы:</Label>
           <Input id="generators" v-model="localStation.generators" type="number" class="mt-1" min="0" max="10" />
         </div>
+     
+
       </div>
+
       <div class="mt-6 flex gap-2">
         <Button @click="$emit('update:open', false)" variant="outline">Закрыть</Button>
         <Button @click="save">Сохранить</Button>
@@ -94,3 +97,26 @@ const save = () => {
   emit('update:open', false);
 };
 </script>
+
+<style scoped lang="css">
+.qrcode {
+  display: inline-block;
+  font-size: 0;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.qrcode__image {
+  background-color: #fff;
+  border: 0.25rem solid #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.25);
+  height: 15%;
+  left: 50%;
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 15%;
+}
+</style>
