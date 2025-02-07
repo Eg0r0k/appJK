@@ -12,5 +12,4 @@
 <script setup lang="ts">
 import HeaderNav from './HeaderNav.vue';
 import HeaderUser from './HeaderUser.vue';
-
 </script>

@@ -9,6 +9,7 @@ export const useAuthStore = defineStore("auth", () => {
     username: "asdasd",
     firstName: "Анатолий",
     lastName: "Анатоливич",
+    phone: null,
     imgURL: "/sdsd/",
     email: "asdasd@sds.sd",
     post: Post.Operator,

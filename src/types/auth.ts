@@ -13,6 +13,7 @@ export interface UserI {
   lastName: string;
   imgURL: string;
   email: string;
+  phone: string | null;
   post: Post;
   birthday: Date | null;
 }
@@ -23,4 +24,3 @@ export interface SignupDTO {
   username: string;
   birthday: Date | null;
 }
-

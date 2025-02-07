@@ -85,7 +85,6 @@ export const useFileSaver = () => {
         );
         link.style.position = "absolute";
         link.style.left = "-9999px";
-
         document.body.appendChild(link);
         link.click();
 

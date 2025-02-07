@@ -1,6 +1,6 @@
 <template>
-    <div class="flex gap-2 items-center mb-4">
-        <Input v-model="localSearchQuery" placeholder="Поиск..." class="h-8 w-[150px] lg:w-[250px]" />
+    <div class="flex flex-col gap-2 mb-4 sm:flex-row items-start ">
+        <Input v-model="localSearchQuery" placeholder="Поиск..." class="h-8 w-[250px]" />
 
         <Popover>
             <PopoverTrigger as-child>
@@ -125,7 +125,7 @@
         </Popover>
 
         <Button v-if="isAnyFilterActive" variant="outline" size="sm" class="h-8" @click="$emit('reset-filters')">
-            Сбросить все фильтры
+            Сбросить
         </Button>
     </div>
 </template>

@@ -1,12 +1,12 @@
 <template>
-    <div>
+    <div id="step1">
         <div class="flex justify-between mb-4">
-            <h2 class="text-3xl font-bold tracking-tight">Дашборд</h2>
+            <h2 class="text-3xl font-bold tracking-tight">Обзор</h2>
 
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger as-child>
-                        <Button @click="downloadExcel">Скачать</Button>
+                        <Button id="step3" @click="downloadExcel">Скачать</Button>
                     </TooltipTrigger>
                     <TooltipContent side="left">
                         <p>Сформировать отчет в формате Excel</p>
@@ -14,8 +14,8 @@
                 </Tooltip>
             </TooltipProvider>
         </div>
-        <DashboardStats ref="dashboardStats" />
-        <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 mt-4">
+        <DashboardStats ref="dashboardStats" id="step2" />
+        <div id="step4" class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 mt-4">
             <Card class="col-span-1 sm:col-span-2 lg:col-span-4">
                 <CardHeader>
                     <CardTitle>Статистика</CardTitle>
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from 'vue';
+import { onMounted, Ref, ref } from 'vue';
 import ExcelJS from 'exceljs';
 import DashboardOverview from '@/components/dashboard/DashboardOverview.vue';
 import DashboardStats from '@/components/dashboard/DashboardStats.vue';
@@ -49,9 +49,43 @@ import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
 import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
 import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue';
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
+import DashboardConsumption from '@/components/dashboard/DashboardConsumption.vue';
+import { driver } from "driver.js";
+import router from '@/router';
+
 const { saveFile } = useFileSaver();
 
-import DashboardConsumption from '@/components/dashboard/DashboardConsumption.vue';
+
+const driverObj = driver({
+    showProgress: true,
+    steps: [
+        {
+            element: '#step1',
+            popover: { title: 'Привет!', description: 'Это приложение в котором вы будете у нас работать' },
+        },
+        {
+            element: '#step2',
+            popover: { title: '', description: 'Здесь вы можете отслеживать статистику по электростанциям за выбранный период' },
+        },
+        {
+            element: '#step3',
+            popover: { title: 'Скачивание отчетов', description: "Нажав на эту кнопку вы можете сформировать отчет за выбранный период в формате Excel " }
+        },
+        {
+            element: '#step4',
+            popover: {
+                title: 'Графики', description: "Здесь вы можете удобно просмотреть статистику", onNextClick: () => {
+                    driverObj.moveNext();
+                    router.push("/profile")
+                }
+            }
+        }
+        
+    ]
+});
+
+
+
 interface ConsumptionData {
     name: string
     total: number
@@ -91,4 +125,9 @@ const downloadExcel = async (): Promise<void> => {
         filters: [{ name: "Excel Files", extensions: ["xlsx"] }]
     });
 };
+
+onMounted(() => {
+    driverObj.drive()
+})
+
 </script>
