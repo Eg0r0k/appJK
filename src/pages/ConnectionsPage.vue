@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2 class="text-3xl font-bold tracking-tight mb-4">
+        <h2 class="text-3xl font-bold tracking-tight mb-4" id="step1">
             Подключения
         </h2>
         <div class="flex gap-2 items-center mb-4">

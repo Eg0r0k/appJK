@@ -50,39 +50,12 @@ import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
 import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue';
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
 import DashboardConsumption from '@/components/dashboard/DashboardConsumption.vue';
-import { driver } from "driver.js";
-import router from '@/router';
+import { GuideStep, useDriverStore } from '@/stores/driverStore/driverControl';
+
 
 const { saveFile } = useFileSaver();
+const driverStore = useDriverStore()
 
-
-const driverObj = driver({
-    showProgress: true,
-    steps: [
-        {
-            element: '#step1',
-            popover: { title: 'Привет!', description: 'Это приложение в котором вы будете у нас работать' },
-        },
-        {
-            element: '#step2',
-            popover: { title: '', description: 'Здесь вы можете отслеживать статистику по электростанциям за выбранный период' },
-        },
-        {
-            element: '#step3',
-            popover: { title: 'Скачивание отчетов', description: "Нажав на эту кнопку вы можете сформировать отчет за выбранный период в формате Excel " }
-        },
-        {
-            element: '#step4',
-            popover: {
-                title: 'Графики', description: "Здесь вы можете удобно просмотреть статистику", onNextClick: () => {
-                    driverObj.moveNext();
-                    router.push("/profile")
-                }
-            }
-        }
-        
-    ]
-});
 
 
 
@@ -126,8 +99,7 @@ const downloadExcel = async (): Promise<void> => {
     });
 };
 
-onMounted(() => {
-    driverObj.drive()
-})
+
+
 
 </script>
